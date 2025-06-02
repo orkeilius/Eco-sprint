@@ -8,7 +8,7 @@ function App() {
     <GameProvider>
       <div className="min-h-screen flex flex-col bg-gray-100">
         <NavBar />
-        <main className="flex-1 container mx-auto p-4">
+        <main className="flex-1 w-full p-0">
           <GameManager />
         </main>
         <footer className="bg-gray-200 text-center p-2 text-gray-600 text-sm">
