@@ -162,14 +162,9 @@ const SidePanel = ({ title, children, onTransportSelect, mousePosition }: SidePa
             </div>
           </div>
 
-          {detailedTravelInfo.travelTimesPerMode && Object.keys(detailedTravelInfo.travelTimesPerMode).length > 0 && (
-            <div className="mb-3">
-              <h4 className="font-medium text-blue-700 mb-2">
-                Temps de trajet estimé (OSRM)
-                <span className="text-xs block text-blue-500">
-                  de {playerPosition.name} à {detailedTravelInfo.destinationName || 'destination'}
-                </span>
-              </h4>
+          {onTransportSelect && (
+            <div className="mt-4 border-t border-blue-200 pt-3">
+              <h4 className="font-medium text-blue-700 mb-2">Choisir votre transport</h4>
               <div className="flex flex-col gap-2 text-sm">
                 {Object.entries(detailedTravelInfo.travelTimesPerMode).map(([mode, info]) => {
                   let icon = '📍';
@@ -177,24 +172,30 @@ const SidePanel = ({ title, children, onTransportSelect, mousePosition }: SidePa
                   if (mode === TransportModes.BIKE) {icon = '🚲'; modeName = 'Vélo';}
                   if (mode === TransportModes.PUBLIC) {icon = '🚌'; modeName = 'Transport public';}
                   if (mode === TransportModes.VTC) {icon = '🚕'; modeName = 'VTC';}
+
                   return (
-                    <div key={mode} className="flex items-center gap-2 p-2 bg-blue-100 rounded">
+                    <button
+                      key={mode}
+                      className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
+                      onClick={() => onTransportSelect(mode as TransportMode)}
+                    >
                       <span className="text-lg">{icon}</span>
-                      <span className="flex-1">{modeName}</span>
-                      <span className="font-bold">{info.formatted}</span>
-                    </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{modeName}</div>
+                        <div className="text-xs text-blue-600">
+                          {(info.distance / 1000).toFixed(1)} km • {info.formatted}
+                        </div>
+                      </div>
+                    </button>
                   );
                 })}
               </div>
-            </div>
-          )}
-
-          {onTransportSelect && (
-            <div className="mt-4 border-t border-blue-200 pt-3">
-              <PlanTrip
-                onClose={() => dispatch({ type: 'DESELECT_OBJECTIVE' })}
-                onTransportSelect={onTransportSelect}
-              />
+              <button
+                onClick={() => dispatch({ type: 'DESELECT_OBJECTIVE' })}
+                className="mt-3 w-full py-1 px-2 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 text-sm"
+              >
+                Fermer
+              </button>
             </div>
           )}
           {!onTransportSelect && (
