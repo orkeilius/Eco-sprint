@@ -105,7 +105,7 @@ const DrivingMode = ({
     const co2Emissions = calculateCO2Emissions(distance, mode);
 
     // Score fixe de 100 points par objectif, moins les émissions de CO2
-    const score = Math.max(100 - co2Emissions, 0);
+    const score = Math.max(50 - co2Emissions, 0);
 
     return score;
   };
