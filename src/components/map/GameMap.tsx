@@ -22,6 +22,9 @@ const ROUTE_COLORS: Record<TransportMode, string> = {
 // Couleur pour les aperçus (preview)
 const PREVIEW_COLOR = '#fbbf24'; // jaune
 
+// Récupération de la clé API MapTiler depuis les variables d'environnement
+const MAPTILER_API_KEY = "yDHZdasrhzCDzBddTxCY";
+
 const GameMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
@@ -330,7 +333,7 @@ const GameMap = () => {
 
     map.current = new Map({
       container: mapContainer.current,
-      style: 'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+      style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_API_KEY}`,
       center: [playerPosition.lon, playerPosition.lat],
       zoom: 14,
       pitch: 45,
