@@ -16,7 +16,7 @@ const ScoreDisplay = ({ score, timeRemaining }: ScoreDisplayProps) => {
         <div className="text-2xl font-bold text-green-600">{score}</div>
       </div>
       <div className="bg-green-100 rounded-md p-2">
-        <span className="text-sm text-gray-500">Time Remaining</span>
+        <span className="text-sm text-gray-500">Temps restant</span>
         <div className="text-2xl font-bold text-green-600">{formattedTime}</div>
       </div>
     </div>

@@ -76,19 +76,19 @@ const EndGameScreen = () => {
 
       <div className="text-center mb-6">
         <div className="text-5xl font-bold text-green-600 mb-2">{currentScore}</div>
-        <div className="text-gray-500">Score Total</div>
+        <div className="text-gray-500">Score total</div>
       </div>
       
       <div className="grid grid-cols-2 gap-6 mb-8">
         <div className="bg-green-50 p-4 rounded-lg text-center">
           <div className="text-3xl font-bold text-green-600">{stats.completedObjectivesCount}/{stats.totalObjectivesCount}</div>
-          <div className="text-sm text-gray-600">Objectifs Complétés</div>
+          <div className="text-sm text-gray-600">Objectifs complétés</div>
           <div className="text-sm font-semibold">{stats.completionPercentage}%</div>
         </div>
         
         <div className="bg-green-100 p-4 rounded-lg text-center">
           <div className="text-3xl font-bold text-green-600">{stats.ecologyScore}/100</div>
-          <div className="text-sm text-gray-600">Score Écologique</div>
+          <div className="text-sm text-gray-600">Score écologique</div>
         </div>
         
         <div className="bg-yellow-50 p-4 rounded-lg text-center">
@@ -98,12 +98,12 @@ const EndGameScreen = () => {
         
         <div className="bg-red-50 p-4 rounded-lg text-center">
           <div className="text-3xl font-bold text-red-600">{formatCO2Emissions(stats.totalCO2)}</div>
-          <div className="text-sm text-gray-600">CO₂ Émis</div>
+          <div className="text-sm text-gray-600">CO₂ émis</div>
         </div>
       </div>
       
       <div className="space-y-4 mb-8">
-        <h3 className="font-semibold text-lg border-b pb-2">Statistiques de Transport</h3>
+        <h3 className="font-semibold text-lg border-b pb-2">Statistiques de transport</h3>
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-green-50 p-3 rounded-lg text-center">
             <div className="text-2xl mb-1">🚲</div>
@@ -147,7 +147,7 @@ const EndGameScreen = () => {
           onClick={() => window.location.reload()}
           className="flex-1 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-50"
         >
-          Nouvelle Partie
+          Nouvelle partie
         </button>
         <button 
           onClick={() => dispatch({ type: 'END_GAME' })}

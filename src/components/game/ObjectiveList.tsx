@@ -18,7 +18,7 @@ const ObjectiveList = ({ objectives, onObjectiveSelect }: ObjectiveListProps) =>
 
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-gray-700">Pending Objectives ({pendingObjectives.length})</h3>
+      <h3 className="font-semibold text-gray-700">Objectifs en cours ({pendingObjectives.length})</h3>
       <ul className="space-y-2">
         {pendingObjectives.map((objective) => (
           <li 
@@ -34,7 +34,7 @@ const ObjectiveList = ({ objectives, onObjectiveSelect }: ObjectiveListProps) =>
       
       {completedObjectives.length > 0 && (
         <>
-          <h3 className="font-semibold text-gray-700 mt-6">Completed ({completedObjectives.length})</h3>
+          <h3 className="font-semibold text-gray-700 mt-6">Complétés ({completedObjectives.length})</h3>
           <ul className="space-y-2">
             {completedObjectives.map((objective) => (
               <li 

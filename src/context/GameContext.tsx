@@ -77,7 +77,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         playerName: action.payload.playerName,
         isPlaying: true,
         currentScore: 0,
-        remainingTime: 120 * 60,
+        remainingTime: 60 * 60,
         plannedTrips: [],
         loading: true,
         error: undefined

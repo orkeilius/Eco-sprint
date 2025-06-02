@@ -14,33 +14,33 @@ const StartScreen = () => {
       type: 'START_GAME', 
       payload: { 
         seed: finalSeed,
-        playerName: playerName || 'Player'
+        playerName: playerName || 'Joueur'
       }
     });
   };
 
   return (
     <div className="flex flex-col items-center justify-center max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-      <h1 className="text-3xl font-bold mb-6 text-green-600">Eco sprint</h1>
+      <h1 className="text-3xl font-bold mb-6 text-green-600">Eco Sprint</h1>
       
       <div className="w-full mb-6 bg-green-50 p-4 rounded-md">
-        <h2 className="text-xl font-semibold mb-2">How to Play</h2>
+        <h2 className="text-xl font-semibold mb-2">Comment jouer</h2>
         <p className="text-gray-700">
-          Plan your urban journey through Montpellier, visiting objectives 
-          while optimizing for speed, ecology, and efficiency. Choose between 
-          bike, public transport, and VTC to maximize your score!
+          Planifiez votre parcours urbain à Montpellier en visitant des objectifs 
+          tout en optimisant la rapidité, l'écologie et l'efficacité. Choisissez entre 
+          vélo, transports en commun et VTC pour maximiser votre score !
         </p>
       </div>
       
       <div className="w-full space-y-4 mb-6">
         <div>
-          <label htmlFor="playerName" className="block mb-1 font-medium">Player Name</label>
+          <label htmlFor="playerName" className="block mb-1 font-medium">Nom du joueur</label>
           <input
             type="text"
             id="playerName"
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
-            placeholder="Enter your name"
+            placeholder="Entrez votre nom"
             className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -53,22 +53,22 @@ const StartScreen = () => {
             onChange={() => setUseSeed(!useSeed)}
             className="mr-2"
           />
-          <label htmlFor="useSeed" className="font-medium">Use custom seed</label>
+          <label htmlFor="useSeed" className="font-medium">Utiliser un code de graine personnalisé</label>
         </div>
         
         {useSeed && (
           <div>
-            <label htmlFor="seed" className="block mb-1 font-medium">Seed</label>
+            <label htmlFor="seed" className="block mb-1 font-medium">Graine</label>
             <input
               type="text"
               id="seed"
               value={seed}
               onChange={(e) => setSeed(e.target.value)}
-              placeholder="Enter seed code"
+              placeholder="Entrez le code graine"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Using the same seed will generate the same objectives.
+              Utiliser la même graine générera les mêmes objectifs.
             </p>
           </div>
         )}
@@ -78,10 +78,11 @@ const StartScreen = () => {
         onClick={handleStartGame}
         className="w-full py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 text-lg"
       >
-        Start Game
+        Démarrer la partie
       </button>
     </div>
   );
 };
 
 export default StartScreen;
+

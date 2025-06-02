@@ -40,78 +40,6 @@ const GameMap = () => {
     layerId: string;
   } | null>(null);
 
-  // Fonction pour dessiner un itinéraire sur la carte
-  const drawRoute = async (mode: TransportMode, isPreview: boolean = false) => {
-    if (!map.current || !selectedObjective || !playerPosition) return;
-
-    // Nettoyer les anciennes routes du même type (preview ou principal)
-    clearRoutes(isPreview);
-
-    const sourceId = generateId('source', mode, isPreview);
-    const layerId = generateId('layer', mode, isPreview);
-
-    // Récupérer l'itinéraire
-    const route = await fetchOsrmRoute(
-      playerPosition,
-      selectedObjective,
-      mode,
-      true // Toujours forcer une nouvelle requête pour les aperçus
-    );
-
-    if (!route) return;
-
-    // Supprimer la couche et la source si elles existent déjà
-    if (map.current.getLayer(layerId)) {
-      map.current.removeLayer(layerId);
-    }
-    if (map.current.getSource(sourceId)) {
-      map.current.removeSource(sourceId);
-    }
-
-    // Ajouter la nouvelle source et couche
-    map.current.addSource(sourceId, {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        geometry: route.geometry,
-        properties: {}
-      }
-    });
-
-    map.current.addLayer({
-      id: layerId,
-      type: 'line',
-      source: sourceId,
-      layout: {
-        'line-join': 'round',
-        'line-cap': 'round'
-      },
-      paint: {
-        'line-color': isPreview ? PREVIEW_COLOR : ROUTE_COLORS[mode],
-        'line-width': 5,
-        'line-opacity': 0.85
-      }
-    });
-
-    // Mettre à jour l'état pour suivre les couches actives
-    if (isPreview) {
-      setActivePreviewLayer({ sourceId, layerId });
-    } else {
-      setActiveLayers({ sourceId, layerId });
-
-      // Mettre à jour les informations de route dans le contexte
-      dispatch({
-        type: 'SET_LAST_OSRM_ROUTE',
-        payload: {
-          distance: route.distance,
-          duration: route.duration
-        }
-      });
-    }
-
-    return { sourceId, layerId };
-  };
-
   // Nettoyer les couches d'itinéraire
   const clearRoutes = (isPreview: boolean = false) => {
     if (!map.current) return;
@@ -188,6 +116,7 @@ const GameMap = () => {
     }
     // Si on nettoie l'itinéraire principal, on supprime tout
     else {
+      // Supprimer d'abord les couches principales
       if (activeLayers) {
         safelyRemoveLayerAndSource(activeLayers.layerId, activeLayers.sourceId);
         setActiveLayers(null);
@@ -199,14 +128,14 @@ const GameMap = () => {
         setActivePreviewLayer(null);
       }
 
-      // Et tous les anciens chemins potentiels
+      // Et tous les anciens chemins potentiels pour chaque mode de transport
       Object.values(TransportModes).forEach(mode => {
         // Nettoyer les couches principales
         const sourceId = generateId('source', mode, false);
         const layerId = generateId('layer', mode, false);
         safelyRemoveLayerAndSource(layerId, sourceId);
 
-        // Nettoyer également les couches d'aper��u
+        // Nettoyer également les couches d'aperçu
         const previewSourceId = generateId('source', mode, true);
         const previewLayerId = generateId('layer', mode, true);
         safelyRemoveLayerAndSource(previewLayerId, previewSourceId);
@@ -227,6 +156,81 @@ const GameMap = () => {
         // Ignorer les erreurs ici
       }
     }
+  };
+
+  // Fonction pour dessiner un itinéraire sur la carte
+  const drawRoute = async (mode: TransportMode, isPreview: boolean = false) => {
+    if (!map.current || !selectedObjective || !playerPosition) return;
+
+    // Nettoyer les anciennes routes du même type (preview ou principal)
+    clearRoutes(isPreview);
+
+    const sourceId = generateId('source', mode, isPreview);
+    const layerId = generateId('layer', mode, isPreview);
+
+    // Double vérification - supprimer la couche et la source si elles existent encore
+    if (map.current.getLayer(layerId)) {
+      map.current.removeLayer(layerId);
+    }
+    if (map.current.getSource(sourceId)) {
+      map.current.removeSource(sourceId);
+    }
+
+    // Récupérer l'itinéraire
+    const route = await fetchOsrmRoute(
+      playerPosition,
+      selectedObjective,
+      mode,
+      true // Toujours forcer une nouvelle requête pour les aperçus
+    );
+
+    if (!route) return;
+
+    // Vérifier que la carte est toujours disponible
+    if (!map.current) return;
+
+    // Ajouter la nouvelle source et couche
+    map.current.addSource(sourceId, {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        geometry: route.geometry,
+        properties: {}
+      }
+    });
+
+    map.current.addLayer({
+      id: layerId,
+      type: 'line',
+      source: sourceId,
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      paint: {
+        'line-color': isPreview ? PREVIEW_COLOR : ROUTE_COLORS[mode],
+        'line-width': 5,
+        'line-opacity': 0.85
+      }
+    });
+
+    // Mettre à jour l'état pour suivre les couches actives
+    if (isPreview) {
+      setActivePreviewLayer({ sourceId, layerId });
+    } else {
+      setActiveLayers({ sourceId, layerId });
+
+      // Mettre à jour les informations de route dans le contexte
+      dispatch({
+        type: 'SET_LAST_OSRM_ROUTE',
+        payload: {
+          distance: route.distance,
+          duration: route.duration
+        }
+      });
+    }
+
+    return { sourceId, layerId };
   };
 
   // Rendu des marqueurs d'objectifs
@@ -348,27 +352,35 @@ const GameMap = () => {
 
   // Effet pour gérer le mode de transport normal
   useEffect(() => {
-    if (map.current?.isStyleLoaded() && selectedObjective && playerPosition) {
-      // Nettoyer l'ancien itinéraire
-      clearRoutes(false);
-
-      // Dessiner le nouvel itinéraire pour le mode sélectionné
-      const currentMode = selectedTransportMode || 'bike';
-      console.log(`Affichage de l'itinéraire principal: ${currentMode}`);
-      drawRoute(currentMode, false);
+    if (map.current && map.current.isStyleLoaded() && selectedObjective && playerPosition) {
+      try {
+        // Nettoyer l'ancien itinéraire
+        clearRoutes(false);
+        
+        // Dessiner le nouvel itinéraire pour le mode sélectionné
+        const currentMode = selectedTransportMode || 'bike';
+        console.log(`Affichage de l'itinéraire principal: ${currentMode}`);
+        drawRoute(currentMode, false);
+      } catch (error) {
+        console.error("Erreur lors de l'affichage de l'itinéraire principal:", error);
+      }
     }
   }, [selectedObjective, playerPosition, selectedTransportMode]);
 
   // Effet pour gérer le mode de transport en aperçu (preview)
   useEffect(() => {
-    if (map.current?.isStyleLoaded() && selectedObjective && playerPosition) {
-      // Nettoyer l'ancien aperçu
-      clearRoutes(true);
+    if (map.current && map.current.isStyleLoaded() && selectedObjective && playerPosition) {
+      try {
+        // Nettoyer l'ancien aperçu
+        clearRoutes(true);
 
-      // Si un mode d'aperçu est défini, dessiner l'itinéraire correspondant
-      if (previewTransportMode) {
-        console.log(`Affichage de l'itinéraire en aperçu: ${previewTransportMode}`);
-        drawRoute(previewTransportMode, true);
+        // Si un mode d'aperçu est défini, dessiner l'itinéraire correspondant
+        if (previewTransportMode) {
+          console.log(`Affichage de l'itinéraire en aperçu: ${previewTransportMode}`);
+          drawRoute(previewTransportMode, true);
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'affichage de l'itinéraire en aperçu:", error);
       }
     }
   }, [previewTransportMode, selectedObjective, playerPosition]);

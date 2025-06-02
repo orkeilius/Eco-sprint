@@ -4,7 +4,7 @@ const NavBar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <span className="text-2xl font-bold">🚲</span>
-          <h1 className="text-xl font-semibold">Montpellier Mobility Game</h1>
+          <h1 className="text-xl font-semibold">Eco Sprint</h1>
         </div>
       </div>
     </nav>
