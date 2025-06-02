@@ -9,7 +9,7 @@ import type {Objective} from '../context/GameContext';
 
 // Coordonnées de Montpellier
 const MONTPELLIER_CENTER = { lat: 43.6112422, lon: 3.8767337 };
-const MAX_RADIUS_KM = 10; // Rayon maximum de 10km autour de Montpellier
+const MAX_RADIUS_KM = 20; // Rayon maximum de 10km autour de Montpellier
 
 // Catégories de POI intéressantes pour le jeu
 const POI_CATEGORIES = [
@@ -70,7 +70,7 @@ function createOverpassQuery(): string {
 /**
  * Récupère des POI depuis OpenStreetMap via l'API Overpass
  */
-export async function fetchOsmObjectives(limit: number = 20): Promise<Objective[]> {
+export async function fetchOsmObjectives(limit: number = 50): Promise<Objective[]> {
   try {
     const overpassQuery = createOverpassQuery();
     const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`;

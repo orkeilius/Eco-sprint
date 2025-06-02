@@ -145,7 +145,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (state.isPlaying && state.loading) {
         try {
           // Utiliser la seed comme facteur aléatoire si nécessaire
-          const objectives = await getGameObjectives(20, false);
+          const objectives = await getGameObjectives(50, false);
           dispatch({ type: 'SET_OBJECTIVES', payload: objectives });
         } catch (error) {
           console.error('Erreur lors du chargement des objectifs:', error);
