@@ -40,6 +40,23 @@ const GameMap = () => {
     layerId: string;
   } | null>(null);
 
+  // Fonction pour masquer/afficher l'itinéraire principal sans le supprimer
+  const toggleMainRoute = (visible: boolean) => {
+    if (!map.current || !activeLayers) return;
+
+    try {
+      if (map.current.getLayer(activeLayers.layerId)) {
+        map.current.setLayoutProperty(
+          activeLayers.layerId,
+          'visibility',
+          visible ? 'visible' : 'none'
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de la modification de la visibilité de l'itinéraire:", error);
+    }
+  };
+
   // Nettoyer les couches d'itinéraire
   const clearRoutes = (isPreview: boolean = false) => {
     if (!map.current) return;
@@ -165,6 +182,11 @@ const GameMap = () => {
     // Nettoyer les anciennes routes du même type (preview ou principal)
     clearRoutes(isPreview);
 
+    // Si c'est un aperçu, masquer temporairement l'itinéraire principal
+    if (isPreview && activeLayers) {
+      toggleMainRoute(false);
+    }
+
     const sourceId = generateId('source', mode, isPreview);
     const layerId = generateId('layer', mode, isPreview);
 
@@ -184,7 +206,14 @@ const GameMap = () => {
       true // Toujours forcer une nouvelle requête pour les aperçus
     );
 
-    if (!route) return;
+    if (!route) {
+      // Si l'itinéraire n'a pas pu être récupéré et qu'il s'agissait d'un aperçu,
+      // réafficher l'itinéraire principal
+      if (isPreview && activeLayers) {
+        toggleMainRoute(true);
+      }
+      return;
+    }
 
     // Vérifier que la carte est toujours disponible
     if (!map.current) return;
@@ -378,6 +407,11 @@ const GameMap = () => {
         if (previewTransportMode) {
           console.log(`Affichage de l'itinéraire en aperçu: ${previewTransportMode}`);
           drawRoute(previewTransportMode, true);
+        } else {
+          // Si aucun mode d'aperçu n'est défini, s'assurer que l'itinéraire principal est visible
+          if (activeLayers) {
+            toggleMainRoute(true);
+          }
         }
       } catch (error) {
         console.error("Erreur lors de l'affichage de l'itinéraire en aperçu:", error);
