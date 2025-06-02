@@ -6,6 +6,7 @@ import {type TransportMode, TransportModes} from '../../types/routing.types';
 import { calculateTravelTime, formatTravelTime as formatTravelTimeFromMinutes } from '../../utils/TravelTimeCalculator';
 import { fetchOsrmRoute } from '../../utils/osrm';
 import { useEffect, useState } from 'react';
+import { calculateCO2Emissions } from '../../utils/CO2Calculator';
 
 function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3; // rayon de la Terre en mètres
@@ -192,10 +193,16 @@ const SidePanel = ({ title, children, onTransportSelect, mousePosition }: SidePa
                             payload: newTime
                           });
 
+                          // Calcul des émissions de CO2 pour le mode de transport choisi
+                          const co2Emissions = calculateCO2Emissions(info.distance, mode as TransportMode);
+
+                          // Nouveau calcul du score: 100 points par objectif moins les émissions de CO2
+                          const newScore = state.currentScore + Math.max(100 - co2Emissions, 0);
+
                           // Mise à jour du score
                           dispatch({
                             type: 'UPDATE_SCORE',
-                            payload: state.currentScore + selected.pointValue
+                            payload: newScore
                           });
 
                           // Appel du callback onTransportSelect

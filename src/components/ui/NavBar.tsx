@@ -6,14 +6,6 @@ const NavBar = () => {
           <span className="text-2xl font-bold">🚲</span>
           <h1 className="text-xl font-semibold">Montpellier Mobility Game</h1>
         </div>
-        <div className="space-x-4">
-          <button className="px-3 py-1 bg-white text-blue-600 rounded hover:bg-blue-50">
-            How to Play
-          </button>
-          <button className="px-3 py-1 bg-blue-700 text-white rounded hover:bg-blue-800">
-            Leaderboard
-          </button>
-        </div>
       </div>
     </nav>
   );

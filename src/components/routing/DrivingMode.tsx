@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Objective } from '../game/ObjectiveList';
 import TransportModes from './TransportSelector';
 import { calculateRouteMetrics } from '../../utils/RouteVisualization';
+import { calculateCO2Emissions, formatCO2Emissions } from '../../utils/CO2Calculator';
 
 export interface Trip {
   id: string;
@@ -97,24 +98,22 @@ const DrivingMode = ({
     const remainingMinutes = Math.ceil(tripMetrics.duration * (1 - progress / 100));
     return remainingMinutes;
   };
-    // Calculate score based on transport mode and objective value
-  const calculateTripScore = (_distance: number, mode: TransportMode, pointValue: number) => {
-    // Base points from the objective
-    let score = pointValue;
-      // Add bonus based on transport mode (eco-friendly choices give more points)
-    switch (mode) {
-      case TransportModes.BIKE:
-        score += Math.floor(pointValue * 0.5); // 50% bonus for bikes
-        break;
-      case TransportModes.PUBLIC:
-        score += Math.floor(pointValue * 0.3); // 30% bonus for public transport
-        break;
-      case TransportModes.VTC:
-        score += Math.floor(pointValue * 0.1); // 10% bonus for VTC
-        break;
-    }
-    
+
+  // Calculate score based on transport mode and objective value
+  const calculateTripScore = (distance: number, mode: TransportMode, _pointValue: number) => {
+    // Calcul des émissions de CO2 en grammes
+    const co2Emissions = calculateCO2Emissions(distance, mode);
+
+    // Score fixe de 100 points par objectif, moins les émissions de CO2
+    const score = Math.max(100 - co2Emissions, 0);
+
     return score;
+  };
+
+  // Calcul des émissions de CO2 pour affichage
+  const getCO2EmissionsText = () => {
+    const co2Emissions = calculateCO2Emissions(tripMetrics.distance, transportMode);
+    return formatCO2Emissions(co2Emissions);
   };
 
   // Handle manual completion (skip button)
@@ -163,6 +162,26 @@ const DrivingMode = ({
             </div>
             <div className="font-medium">
               {getTimeRemaining()} min remaining
+            </div>
+          </div>
+
+          {/* Affichage des émissions de CO2 */}
+          <div className="mt-2 text-sm flex justify-between items-center">
+            <div className="text-gray-600">
+              Émissions CO₂:
+            </div>
+            <div className={`font-medium ${transportMode === TransportModes.BIKE ? 'text-green-600' : transportMode === TransportModes.PUBLIC ? 'text-yellow-600' : 'text-red-600'}`}>
+              {getCO2EmissionsText()}
+            </div>
+          </div>
+
+          {/* Affichage du score estimé */}
+          <div className="mt-2 text-sm flex justify-between items-center">
+            <div className="text-gray-600">
+              Score estimé:
+            </div>
+            <div className="font-medium text-blue-600">
+              {calculateTripScore(tripMetrics.distance, transportMode, to.pointValue)} points
             </div>
           </div>
         </div>
