@@ -12,7 +12,7 @@ function App() {
           <GameManager />
         </main>
         <footer className="bg-gray-200 text-center p-2 text-gray-600 text-sm">
-          Montpellier Mobility Game - Urban Journey Optimization
+         Eco Sprint - Montpellier
         </footer>
       </div>
     </GameProvider>

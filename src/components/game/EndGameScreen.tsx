@@ -18,7 +18,7 @@ const EndGameScreen = () => {
     const totalDistance = plannedTrips.reduce((total, trip) => total + trip.distance, 0) / 1000;
 
     // Temps total passé (en minutes)
-    const totalTimeSpent = plannedTrips.reduce((total, trip) => total + trip.estimatedDuration, 0);
+    const totalTimeSpent = plannedTrips.reduce((total, trip) => total + trip.duration, 0) / 60;
 
     // Émissions de CO2 totales (en grammes)
     const totalCO2 = plannedTrips.reduce((total, trip) => {
