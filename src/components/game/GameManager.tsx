@@ -65,10 +65,13 @@ const GameManager = () => {
           <ScoreDisplay score={currentScore} timeRemaining={remainingTime} />
           
           <div className="flex-1 flex flex-col md:flex-row gap-4">
-            {/* Side panel */}
+            {/* Side panel avec planification intégrée */}
             <div className="md:w-1/4 w-full">
-              <SidePanel title="Objectives">
-                <ObjectiveList 
+              <SidePanel
+                title="Objectives"
+                onTransportSelect={selectedObjective && !isDriving ? handleTransportSelect : undefined}
+              >
+                <ObjectiveList
                   objectives={objectives} 
                   onObjectiveSelect={handleObjectiveSelect} 
                 />
@@ -77,20 +80,10 @@ const GameManager = () => {
             
             {/* Main game area */}
             <div className="md:w-3/4 w-full flex-1 relative">
-              {/* Map component always visible */}
+              {/* Map component */}
               <div className="h-full">
                 <GameMap />
               </div>
-              
-              {/* Planning overlay */}
-              {selectedObjective && !isDriving ? (
-                <div className="absolute inset-0 z-10 bg-white bg-opacity-90 p-4 rounded-lg">
-                  <PlanTrip 
-                    onClose={() => dispatch({ type: 'DESELECT_OBJECTIVE' })}
-                    onTransportSelect={handleTransportSelect}
-                  />
-                </div>
-              ) : null}
               
               {/* Driving mode overlay */}
               {isDriving && selectedObjective && activeTrip && (

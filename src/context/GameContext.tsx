@@ -34,6 +34,8 @@ export interface GameState {
   selectedObjective?: Objective;
   loading: boolean;
   error?: string;
+  playerPosition: { lat: number; lon: number; name: string };
+  lastOsrmRoute?: { distance: number; duration: number };
 }
 
 type GameAction =
@@ -46,7 +48,8 @@ type GameAction =
   | { type: 'UPDATE_SCORE'; payload: number }
   | { type: 'SET_OBJECTIVES'; payload: Objective[] }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string };
+  | { type: 'SET_ERROR'; payload: string }
+  | { type: 'SET_LAST_OSRM_ROUTE'; payload: { distance: number; duration: number } };
 
 const initialState: GameState = {
   seed: '',
@@ -56,7 +59,8 @@ const initialState: GameState = {
   currentScore: 0,
   isPlaying: false,
   isDriving: false,
-  loading: false
+  loading: false,
+  playerPosition: { lat: 43.610769, lon: 3.876716, name: 'Place de la Comédie' }
 };
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -87,7 +91,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         objectives: state.objectives.map(obj =>
           obj.id === action.payload.id ? { ...obj, completed: true } : obj
         ),
-        selectedObjective: undefined
+        selectedObjective: undefined,
+        playerPosition: {
+          lat: action.payload.lat,
+          lon: action.payload.lon,
+          name: action.payload.name
+        }
       };
     case 'UPDATE_SCORE':
       return { ...state, currentScore: action.payload };
@@ -97,6 +106,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false };
+    case 'SET_LAST_OSRM_ROUTE':
+      return { ...state, lastOsrmRoute: action.payload };
     default:
       return state;
   }
