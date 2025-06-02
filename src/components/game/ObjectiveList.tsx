@@ -23,7 +23,7 @@ const ObjectiveList = ({ objectives, onObjectiveSelect }: ObjectiveListProps) =>
         {pendingObjectives.map((objective) => (
           <li 
             key={objective.id}
-            className="p-2 bg-blue-50 rounded-md flex justify-between items-center cursor-pointer hover:bg-blue-100 transition-colors"
+            className="p-2 bg-green-50 rounded-md flex justify-between items-center cursor-pointer hover:bg-green-100 transition-colors"
             onClick={() => onObjectiveSelect?.(objective)}
           >
             <span className="font-medium">{objective.name}</span>

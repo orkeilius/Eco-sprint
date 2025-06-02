@@ -135,7 +135,7 @@ const DrivingMode = ({
     <>
       {/* This is now an overlay on the map rather than a replacement */}
       <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-lg bg-white rounded-lg shadow-lg overflow-hidden z-10">
-        <div className="bg-blue-600 text-white p-3 flex justify-between items-center">
+        <div className="bg-green-600 text-white p-3 flex justify-between items-center">
           <h2 className="text-lg font-semibold">En Route: {getIcon()}</h2>
           <div className="flex items-center space-x-3">
             <span>{from.name}</span>
@@ -180,7 +180,7 @@ const DrivingMode = ({
             <div className="text-gray-600">
               Score estimé:
             </div>
-            <div className="font-medium text-blue-600">
+            <div className="font-medium text-green-600">
               {calculateTripScore(tripMetrics.distance, transportMode, to.pointValue)} points
             </div>
           </div>
@@ -197,7 +197,7 @@ const DrivingMode = ({
         </button>
         <button 
           onClick={handleComplete}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-md"
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 shadow-md"
         >
           {progress >= 100 ? 'Complete' : 'Skip'}
         </button>

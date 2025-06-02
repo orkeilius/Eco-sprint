@@ -15,9 +15,9 @@ const ScoreDisplay = ({ score, timeRemaining }: ScoreDisplayProps) => {
         <span className="text-sm text-gray-500">Score</span>
         <div className="text-2xl font-bold text-green-600">{score}</div>
       </div>
-      <div className="bg-blue-50 rounded-md p-2">
+      <div className="bg-green-100 rounded-md p-2">
         <span className="text-sm text-gray-500">Time Remaining</span>
-        <div className="text-2xl font-bold text-blue-600">{formattedTime}</div>
+        <div className="text-2xl font-bold text-green-600">{formattedTime}</div>
       </div>
     </div>
   );

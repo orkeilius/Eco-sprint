@@ -15,15 +15,15 @@ const StartScreen = () => {
       payload: { 
         seed: finalSeed,
         playerName: playerName || 'Player'
-      } 
+      }
     });
   };
 
   return (
     <div className="flex flex-col items-center justify-center max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-      <h1 className="text-3xl font-bold mb-6 text-blue-600">Montpellier Mobility Game</h1>
+      <h1 className="text-3xl font-bold mb-6 text-green-600">Eco sprint</h1>
       
-      <div className="w-full mb-6 bg-blue-50 p-4 rounded-md">
+      <div className="w-full mb-6 bg-green-50 p-4 rounded-md">
         <h2 className="text-xl font-semibold mb-2">How to Play</h2>
         <p className="text-gray-700">
           Plan your urban journey through Montpellier, visiting objectives 
@@ -76,7 +76,7 @@ const StartScreen = () => {
       
       <button
         onClick={handleStartGame}
-        className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 text-lg"
+        className="w-full py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 text-lg"
       >
         Start Game
       </button>

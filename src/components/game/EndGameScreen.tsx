@@ -75,18 +75,18 @@ const EndGameScreen = () => {
       <h2 className="text-3xl font-bold mb-4 text-center">Résultats de la partie</h2>
 
       <div className="text-center mb-6">
-        <div className="text-5xl font-bold text-blue-600 mb-2">{currentScore}</div>
+        <div className="text-5xl font-bold text-green-600 mb-2">{currentScore}</div>
         <div className="text-gray-500">Score Total</div>
       </div>
       
       <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="bg-blue-50 p-4 rounded-lg text-center">
-          <div className="text-3xl font-bold text-blue-600">{stats.completedObjectivesCount}/{stats.totalObjectivesCount}</div>
+        <div className="bg-green-50 p-4 rounded-lg text-center">
+          <div className="text-3xl font-bold text-green-600">{stats.completedObjectivesCount}/{stats.totalObjectivesCount}</div>
           <div className="text-sm text-gray-600">Objectifs Complétés</div>
           <div className="text-sm font-semibold">{stats.completionPercentage}%</div>
         </div>
         
-        <div className="bg-green-50 p-4 rounded-lg text-center">
+        <div className="bg-green-100 p-4 rounded-lg text-center">
           <div className="text-3xl font-bold text-green-600">{stats.ecologyScore}/100</div>
           <div className="text-sm text-gray-600">Score Écologique</div>
         </div>
@@ -145,13 +145,13 @@ const EndGameScreen = () => {
       <div className="flex space-x-4 mt-6">
         <button 
           onClick={() => window.location.reload()}
-          className="flex-1 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50"
+          className="flex-1 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-50"
         >
           Nouvelle Partie
         </button>
         <button 
           onClick={() => dispatch({ type: 'END_GAME' })}
-          className="flex-1 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          className="flex-1 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
         >
           Retour au menu
         </button>
