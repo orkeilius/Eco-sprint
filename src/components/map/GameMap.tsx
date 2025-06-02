@@ -36,21 +36,27 @@ const GameMap = () => {
     }
 
     const modeToDraw: TransportMode = previewTransportMode || selectedTransportMode || 'bike';
-    const cacheKey = getCacheKey(playerPosition, selectedObjective, modeToDraw);
+
+    // Important: Ne pas utiliser le cache local pour les modes prévisualisés (survol)
+    // afin de s'assurer que la route est toujours calculée avec le bon profil
     let route: OsrmRoute | null = null;
 
-    if (routeCache.current.hasOwnProperty(cacheKey)) {
-      route = routeCache.current[cacheKey];
-    } else {
-      route = await fetchOsrmRoute(
-        playerPosition,
-        selectedObjective,
-        modeToDraw
-      );
-      routeCache.current[cacheKey] = route; // Mettre en cache le résultat (même si null)
+    // Calculer toujours une nouvelle route pour le mode prévisualisé
+    route = await fetchOsrmRoute(
+      playerPosition,
+      selectedObjective,
+      modeToDraw,
+      !!previewTransportMode // forceRefresh = true pour les aperçus
+    );
+    console.log('mode :',modeToDraw);
+
+    // Ne stocker dans le cache local que les routes "normales" (non aperçu)
+    if (!previewTransportMode) {
+      const cacheKey = getCacheKey(playerPosition, selectedObjective, modeToDraw);
+      routeCache.current[cacheKey] = route;
     }
 
-    // Supprimer l'ancien chemin s'il existe (redondant avec le nettoyage au début si !selectedObjective mais utile ici)
+    // Supprimer l'ancien chemin s'il existe
     if (map.current.getSource('player-path')) {
       try { map.current.removeLayer('player-path'); } catch {}
       try { map.current.removeSource('player-path'); } catch {}
@@ -78,14 +84,8 @@ const GameMap = () => {
       });
 
       // Mettre à jour lastOsrmRoute seulement si ce n'est pas un aperçu
-      // et que le mode dessiné correspond au mode sélectionné principal (ou au mode par défaut 'bike')
       if (!previewTransportMode) {
-        if ((selectedTransportMode && modeToDraw === selectedTransportMode) || (!selectedTransportMode && modeToDraw === 'bike')) {
-            dispatch({ type: 'SET_LAST_OSRM_ROUTE', payload: { distance: route.distance, duration: route.duration } });
-        }
-      } else {
-        // Si c'est un aperçu, on ne met pas à jour la route principale dans le contexte
-        // mais on pourrait vouloir nettoyer si l'aperçu ne correspond plus à rien
+        dispatch({ type: 'SET_LAST_OSRM_ROUTE', payload: { distance: route.distance, duration: route.duration } });
       }
     } else {
       // Si la route est null (échec OSRM ou pas de route), s'assurer que lastOsrmRoute est nettoyé si ce n'est pas un aperçu
@@ -217,9 +217,15 @@ const GameMap = () => {
   // Redessine le chemin si l'objectif sélectionné, la position du joueur, ou le mode d'aperçu/sélectionné change
   useEffect(() => {
     if (map.current?.isStyleLoaded() && playerPosition) { // S'assurer que playerPosition est disponible
+      // Forcer l'effacement du cache de route local à chaque changement de mode
+      // pour s'assurer que la nouvelle route est bien calculée avec le bon profil
+      if (previewTransportMode !== undefined) {
+        const cacheKey = getCacheKey(playerPosition, selectedObjective!, previewTransportMode);
+        delete routeCache.current[cacheKey];
+      }
       drawPathToObjective();
     }
-  }, [selectedObjective, playerPosition, selectedTransportMode, previewTransportMode, dispatch]); // Ajout de dispatch aux dépendances
+  }, [selectedObjective, playerPosition, selectedTransportMode, previewTransportMode, dispatch]);
 
   return (
     <div className="h-full relative map-wrapper">

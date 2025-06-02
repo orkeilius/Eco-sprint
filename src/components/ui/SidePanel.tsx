@@ -19,10 +19,10 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 }
 
-// Fonction pour formater le temps en minutes/heures à partir de secondes
+// Fonction pour formater le temps en minutes/heures à partir de secondes, arrondi à la minute
 function formatDurationFromSeconds(seconds: number): string {
-  if (seconds < 60) {
-    return `${Math.round(seconds)} sec`;
+  if (seconds < 30) {
+    return "1 min"; // Minimum 1 minute pour tout trajet
   } else if (seconds < 3600) {
     return `${Math.round(seconds / 60)} min`;
   } else {
@@ -177,7 +177,39 @@ const SidePanel = ({ title, children, onTransportSelect, mousePosition }: SidePa
                     <button
                       key={mode}
                       className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
-                      onClick={() => onTransportSelect(mode as TransportMode)}
+                      onClick={() => {
+                        if (selected && info) {
+                          // Déplace le joueur vers l'objectif
+                          dispatch({
+                            type: 'COMPLETE_OBJECTIVE',
+                            payload: selected
+                          });
+
+                          // Déduit le temps de trajet du temps restant
+                          const newTime = Math.max(0, state.remainingTime - info.timeInSeconds);
+                          dispatch({
+                            type: 'UPDATE_TIME',
+                            payload: newTime
+                          });
+
+                          // Mise à jour du score
+                          dispatch({
+                            type: 'UPDATE_SCORE',
+                            payload: state.currentScore + selected.pointValue
+                          });
+
+                          // Appel du callback onTransportSelect
+                          onTransportSelect(mode as TransportMode);
+                        }
+                      }}
+                      onMouseEnter={() => {
+                        // Activer l'aperçu du trajet avec ce mode de transport
+                        dispatch({ type: 'SET_PREVIEW_TRANSPORT_MODE', payload: mode as TransportMode });
+                      }}
+                      onMouseLeave={() => {
+                        // Désactiver l'aperçu lors de la sortie du survol
+                        dispatch({ type: 'SET_PREVIEW_TRANSPORT_MODE', payload: undefined });
+                      }}
                     >
                       <span className="text-lg">{icon}</span>
                       <div className="flex-1">

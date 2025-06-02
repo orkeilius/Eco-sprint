@@ -14,22 +14,8 @@ import type { Trip } from '../routing/DrivingMode';
 const GameManager = () => {
   const { state, dispatch } = useGameState();
   const { objectives, currentScore, remainingTime, selectedObjective, isDriving, activeTrip } = state;
-  
-  // Mock timer
-  useEffect(() => {
-    if (!state.isPlaying) return;
-    
-    const timer = setInterval(() => {
-      if (remainingTime > 0) {
-        dispatch({ type: 'UPDATE_TIME', payload: remainingTime - 1 });
-      } else {
-        dispatch({ type: 'END_GAME' });
-      }
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [state.isPlaying, remainingTime, dispatch]);
-  
+
+
   // Handle objective selection
   const handleObjectiveSelect = (objective: typeof objectives[0]) => {
     dispatch({ type: 'SELECT_OBJECTIVE', payload: objective });
