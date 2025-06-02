@@ -180,11 +180,30 @@ const SidePanel = ({ title, children, onTransportSelect, mousePosition }: SidePa
                       className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
                       onClick={() => {
                         if (selected && info) {
+                          // Calcul des émissions de CO2 pour le mode de transport choisi
+                          const co2Emissions = calculateCO2Emissions(info.distance, mode as TransportMode);
+
                           // Déplace le joueur vers l'objectif
                           dispatch({
                             type: 'COMPLETE_OBJECTIVE',
-                            payload: selected
-                          });
+                            payload: selected,
+                            // Ajout du trajet pour l'historique/statistiques
+                            trip: {
+                              id: `${state.playerPosition.lat},${state.playerPosition.lon}->${selected.lat},${selected.lon}-${mode}`,
+                              from: {
+                                ...state.playerPosition,
+                                // On ne garde que les champs nécessaires pour Objective
+                                id: 'player',
+                                pointValue: 0,
+                                completed: true
+                              },
+                              to: selected,
+                              transportMode: mode as TransportMode,
+                              duration: info.timeInSeconds,
+                              distance: info.distance,
+                              score: Math.max(100 - co2Emissions, 0)
+                            }
+                          } as any);
 
                           // Déduit le temps de trajet du temps restant
                           const newTime = Math.max(0, state.remainingTime - info.timeInSeconds);
@@ -192,9 +211,6 @@ const SidePanel = ({ title, children, onTransportSelect, mousePosition }: SidePa
                             type: 'UPDATE_TIME',
                             payload: newTime
                           });
-
-                          // Calcul des émissions de CO2 pour le mode de transport choisi
-                          const co2Emissions = calculateCO2Emissions(info.distance, mode as TransportMode);
 
                           // Nouveau calcul du score: 100 points par objectif moins les émissions de CO2
                           const newScore = state.currentScore + Math.max(100 - co2Emissions, 0);

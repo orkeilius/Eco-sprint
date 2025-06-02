@@ -46,7 +46,7 @@ type GameAction =
   | { type: 'UPDATE_TIME'; payload: number }
   | { type: 'SELECT_OBJECTIVE'; payload: Objective }
   | { type: 'DESELECT_OBJECTIVE' }
-  | { type: 'COMPLETE_OBJECTIVE'; payload: Objective }
+  | { type: 'COMPLETE_OBJECTIVE'; payload: Objective; trip?: Trip }
   | { type: 'UPDATE_SCORE'; payload: number }
   | { type: 'SET_OBJECTIVES'; payload: Objective[] }
   | { type: 'SET_LOADING'; payload: boolean }
@@ -59,7 +59,7 @@ const initialState: GameState = {
   seed: '',
   objectives: [],
   plannedTrips: [],
-  remainingTime: 15 * 60,
+  remainingTime: 60 * 60,
   currentScore: 0,
   isPlaying: false,
   isDriving: false,
@@ -77,7 +77,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         playerName: action.payload.playerName,
         isPlaying: true,
         currentScore: 0,
-        remainingTime: 15 * 60,
+        remainingTime: 120 * 60,
         plannedTrips: [],
         loading: true,
         error: undefined
@@ -90,20 +90,24 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, selectedObjective: action.payload };
     case 'DESELECT_OBJECTIVE':
       return { ...state, selectedObjective: undefined };
-    case 'COMPLETE_OBJECTIVE':
+    case 'COMPLETE_OBJECTIVE': {
+      const trip = action.trip;
       return {
         ...state,
         objectives: state.objectives.map(obj =>
           obj.id === action.payload.id ? { ...obj, completed: true } : obj
         ),
         selectedObjective: undefined,
-        // Déplace le joueur à la position de l'objectif atteint
         playerPosition: {
           lat: action.payload.lat,
           lon: action.payload.lon,
           name: action.payload.name
-        }
+        },
+        plannedTrips: trip
+          ? [...state.plannedTrips, trip]
+          : state.plannedTrips
       };
+    }
     case 'UPDATE_SCORE':
       return { ...state, currentScore: action.payload };
     case 'SET_OBJECTIVES':
