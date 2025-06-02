@@ -1,12 +1,5 @@
-// Using const for runtime availability
-export const TransportModes = {
-  BIKE: 'bike',
-  PUBLIC: 'public',
-  VTC: 'vtc'
-} as const;
-
-// Type for TypeScript type checking
-export type TransportMode = typeof TransportModes[keyof typeof TransportModes];
+import { useGameState } from '../../context/GameContext';
+import {type TransportMode, TransportModes } from '../../types/routing.types'; // Correction du chemin d'importation
 
 interface TransportOption {
   mode: TransportMode;
@@ -22,11 +15,13 @@ interface TransportSelectorProps {
 }
 
 const TransportSelector = ({ onTransportSelect }: TransportSelectorProps) => {
+  const { dispatch } = useGameState();
+
   const transportOptions: TransportOption[] = [
     {
       mode: TransportModes.BIKE,
       icon: '🚲',
-      name: 'Bicycle',
+      name: 'Vélo', // Traduction
       ecologyFactor: 0.9,
       speedFactor: 0.7,
       costFactor: 0.2
@@ -34,7 +29,7 @@ const TransportSelector = ({ onTransportSelect }: TransportSelectorProps) => {
     {
       mode: TransportModes.PUBLIC,
       icon: '🚌',
-      name: 'Public Transport',
+      name: 'Transport Public', // Traduction
       ecologyFactor: 0.7,
       speedFactor: 0.8,
       costFactor: 0.5
@@ -49,6 +44,19 @@ const TransportSelector = ({ onTransportSelect }: TransportSelectorProps) => {
     }
   ];
 
+  const handleTransportSelect = (mode: TransportMode) => {
+    dispatch({ type: 'SET_TRANSPORT_MODE', payload: mode });
+    onTransportSelect(mode);
+  };
+
+  const handleMouseEnter = (mode: TransportMode) => {
+    dispatch({ type: 'SET_PREVIEW_TRANSPORT_MODE', payload: mode });
+  };
+
+  const handleMouseLeave = () => {
+    dispatch({ type: 'SET_PREVIEW_TRANSPORT_MODE', payload: undefined });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-3">
       <h2 className="text-lg font-semibold mb-3 text-gray-800">Choix du transport</h2>
@@ -57,7 +65,9 @@ const TransportSelector = ({ onTransportSelect }: TransportSelectorProps) => {
           <button
             key={option.mode}
             className="p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
-            onClick={() => onTransportSelect(option.mode)}
+            onClick={() => handleTransportSelect(option.mode)}
+            onMouseEnter={() => handleMouseEnter(option.mode)}
+            onMouseLeave={handleMouseLeave}
           >
             <div className="flex items-center gap-3">
               <div className="text-2xl">{option.icon}</div>

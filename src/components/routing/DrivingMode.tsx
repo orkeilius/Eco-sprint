@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Objective } from '../game/ObjectiveList';
-import { TransportModes, type TransportMode } from './TransportSelector';
+import TransportModes from './TransportSelector';
 import { calculateRouteMetrics } from '../../utils/RouteVisualization';
 
 export interface Trip {

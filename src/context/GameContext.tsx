@@ -32,6 +32,8 @@ export interface GameState {
   isPlaying: boolean;
   isDriving: boolean;
   selectedObjective?: Objective;
+  selectedTransportMode?: 'bike' | 'public' | 'vtc';
+  previewTransportMode?: 'bike' | 'public' | 'vtc'; // Pour l'aperçu de l'itinéraire au survol
   loading: boolean;
   error?: string;
   playerPosition: { lat: number; lon: number; name: string };
@@ -49,7 +51,9 @@ type GameAction =
   | { type: 'SET_OBJECTIVES'; payload: Objective[] }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string }
-  | { type: 'SET_LAST_OSRM_ROUTE'; payload: { distance: number; duration: number } };
+  | { type: 'SET_LAST_OSRM_ROUTE'; payload: { distance: number; duration: number } }
+  | { type: 'SET_TRANSPORT_MODE'; payload: 'bike' | 'public' | 'vtc' }
+  | { type: 'SET_PREVIEW_TRANSPORT_MODE'; payload?: 'bike' | 'public' | 'vtc' };
 
 const initialState: GameState = {
   seed: '',
@@ -60,6 +64,7 @@ const initialState: GameState = {
   isPlaying: false,
   isDriving: false,
   loading: false,
+  selectedTransportMode: 'bike',
   playerPosition: { lat: 43.610769, lon: 3.876716, name: 'Place de la Comédie' }
 };
 
@@ -92,6 +97,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           obj.id === action.payload.id ? { ...obj, completed: true } : obj
         ),
         selectedObjective: undefined,
+        // Déplace le joueur à la position de l'objectif atteint
         playerPosition: {
           lat: action.payload.lat,
           lon: action.payload.lon,
@@ -108,6 +114,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, error: action.payload, loading: false };
     case 'SET_LAST_OSRM_ROUTE':
       return { ...state, lastOsrmRoute: action.payload };
+    case 'SET_TRANSPORT_MODE':
+      return { ...state, selectedTransportMode: action.payload };
+    case 'SET_PREVIEW_TRANSPORT_MODE':
+      return { ...state, previewTransportMode: action.payload };
     default:
       return state;
   }

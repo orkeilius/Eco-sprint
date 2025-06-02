@@ -1,7 +1,6 @@
 // Route visualization utilities for MapLibre GL
 import { Map } from 'maplibre-gl';
-import { TransportModes, type TransportMode } from '../components/routing/TransportSelector';
-
+import TransportModes from "../components/routing/TransportSelector"
 // Route visualization colors by transport mode
 const routeColors = {
   [TransportModes.BIKE]: '#22C55E', // green

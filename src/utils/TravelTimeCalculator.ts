@@ -1,8 +1,7 @@
 /**
  * Utilitaire pour calculer les temps de trajet en fonction du mode de transport
  */
-import {TransportModes } from '../components/routing/TransportSelector';
-
+import TransportModes from "../components/routing/TransportSelector"
 // Vitesses moyennes en km/h pour chaque mode de transport
 const AVERAGE_SPEEDS = {
   [TransportModes.BIKE]: 15,     // 15 km/h pour le vélo
