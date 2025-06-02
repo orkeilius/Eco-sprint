@@ -20,8 +20,8 @@ const GameMap = () => {
     objectives.forEach(obj => {
       const el = document.createElement('div');
       el.className = 'marker-objective';
-      el.style.width = '24px';
-      el.style.height = '24px';
+      el.style.width = '28px';
+      el.style.height = '28px';
       el.style.borderRadius = '50%';
       el.style.display = 'flex';
       el.style.alignItems = 'center';
@@ -30,8 +30,9 @@ const GameMap = () => {
       el.style.cursor = 'pointer';
       el.style.background = obj.completed ? '#bbb' : '#2563eb';
       el.style.color = obj.completed ? '#eee' : '#fff';
-      el.textContent = obj.pointValue.toString();
       el.title = obj.name;
+      // Icône SVG cible
+      el.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9" stroke="white" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="5" stroke="white" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="2" fill="white"/></svg>`;
       el.onclick = () => {
         if (!obj.completed) {
           dispatch({ type: 'SELECT_OBJECTIVE', payload: obj });
