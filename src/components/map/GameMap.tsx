@@ -18,29 +18,57 @@ const GameMap = () => {
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
     objectives.forEach(obj => {
+      // Création du conteneur du marqueur
       const el = document.createElement('div');
       el.className = 'marker-objective';
-      el.style.width = '28px';
-      el.style.height = '28px';
-      el.style.borderRadius = '50%';
-      el.style.display = 'flex';
-      el.style.alignItems = 'center';
-      el.style.justifyContent = 'center';
-      el.style.fontWeight = 'bold';
-      el.style.cursor = 'pointer';
-      el.style.background = obj.completed ? '#bbb' : '#2563eb';
-      el.style.color = obj.completed ? '#eee' : '#fff';
+
+      // Fonction pour déterminer l'emoji en fonction du type d'objectif
+      const getEmoji = () => {
+        if (obj.description) {
+          const desc = obj.description.toLowerCase();
+          if (desc.includes('museum')) return '🏛️';
+          if (desc.includes('park') || desc.includes('garden')) return '🌳';
+          if (desc.includes('attraction')) return '🎭';
+          if (desc.includes('restaurant') || desc.includes('cafe')) return '🍽️';
+          if (desc.includes('cinema') || desc.includes('theatre')) return '🎬';
+          if (desc.includes('shop') || desc.includes('mall')) return '🛍️';
+          if (desc.includes('swimming')) return '🏊';
+          if (desc.includes('university')) return '🎓';
+          if (desc.includes('monument') || desc.includes('castle')) return '🏰';
+          if (desc.includes('library')) return '📚';
+          if (desc.includes('sports')) return '⚽';
+          if (desc.includes('artwork')) return '🎨';
+        }
+        return '📍'; // Emoji par défaut
+      };
+
+      // Utilisation des classes CSS pour la forme d'épingle
+      const pinElement = document.createElement('div');
+      pinElement.className = 'marker-pin';
+      pinElement.style.color = obj.completed ? '#9CA3AF' : '#2563eb';
+
+      // Création du conteneur pour l'emoji
+      const iconElement = document.createElement('div');
+      iconElement.className = 'marker-icon';
+      iconElement.textContent = getEmoji();
+
+      // Assemblage des éléments
+      pinElement.appendChild(iconElement);
+      el.appendChild(pinElement);
+
+      // Configuration du titre et de l'événement au clic
       el.title = obj.name;
-      // Icône SVG cible
-      el.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9" stroke="white" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="5" stroke="white" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="2" fill="white"/></svg>`;
       el.onclick = () => {
         if (!obj.completed) {
           dispatch({ type: 'SELECT_OBJECTIVE', payload: obj });
         }
       };
+
+      // Création et ajout du marqueur à la carte
       const marker = new Marker({ element: el })
         .setLngLat([obj.lon, obj.lat])
         .addTo(map.current!);
+
       markers.current.push(marker);
     });
   };

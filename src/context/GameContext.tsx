@@ -1,9 +1,11 @@
-import { createContext, useContext, useReducer, useMemo } from 'react';
+import { createContext, useContext, useReducer, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { getGameObjectives } from '../utils/PoiGenerator';
 
 export interface Objective {
   id: string;
   name: string;
+  description?: string;
   lat: number;
   lon: number;
   pointValue: number;
@@ -30,6 +32,8 @@ export interface GameState {
   isPlaying: boolean;
   isDriving: boolean;
   selectedObjective?: Objective;
+  loading: boolean;
+  error?: string;
 }
 
 type GameAction =
@@ -39,7 +43,10 @@ type GameAction =
   | { type: 'SELECT_OBJECTIVE'; payload: Objective }
   | { type: 'DESELECT_OBJECTIVE' }
   | { type: 'COMPLETE_OBJECTIVE'; payload: Objective }
-  | { type: 'UPDATE_SCORE'; payload: number };
+  | { type: 'UPDATE_SCORE'; payload: number }
+  | { type: 'SET_OBJECTIVES'; payload: Objective[] }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string };
 
 const initialState: GameState = {
   seed: '',
@@ -48,32 +55,9 @@ const initialState: GameState = {
   remainingTime: 15 * 60,
   currentScore: 0,
   isPlaying: false,
-  isDriving: false
+  isDriving: false,
+  loading: false
 };
-
-function generateMockObjectives(): Objective[] {
-  const base = { lat: 43.6112422, lon: 3.8767337 };
-  const names = [
-    'Place de la Comédie',
-    'Gare Saint-Roch',
-    'Polygone',
-    'Jardin du Peyrou',
-    'Antigone',
-    'Lez',
-    'Odysseum',
-    'Arceaux',
-    'Mosson',
-    'Port Marianne'
-  ];
-  return names.map((name, i) => ({
-    id: `obj-${i}`,
-    name,
-    lat: base.lat + 0.01 * Math.cos((i / names.length) * 2 * Math.PI),
-    lon: base.lon + 0.015 * Math.sin((i / names.length) * 2 * Math.PI),
-    pointValue: 10,
-    completed: false
-  }));
-}
 
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -83,10 +67,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         seed: action.payload.seed,
         playerName: action.payload.playerName,
         isPlaying: true,
-        objectives: generateMockObjectives(),
         currentScore: 0,
         remainingTime: 15 * 60,
-        plannedTrips: []
+        plannedTrips: [],
+        loading: true,
+        error: undefined
       };
     case 'END_GAME':
       return { ...state, isPlaying: false };
@@ -106,6 +91,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     case 'UPDATE_SCORE':
       return { ...state, currentScore: action.payload };
+    case 'SET_OBJECTIVES':
+      return { ...state, objectives: action.payload, loading: false };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload, loading: false };
     default:
       return state;
   }
@@ -122,6 +113,25 @@ const GameContext = createContext<{
 export function GameProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const value = useMemo(() => ({ state, dispatch }), [state]);
+
+  // Chargement des objectifs lorsque le jeu démarre
+  useEffect(() => {
+    async function loadObjectives() {
+      if (state.isPlaying && state.loading) {
+        try {
+          // Utiliser la seed comme facteur aléatoire si nécessaire
+          const objectives = await getGameObjectives(20, false);
+          dispatch({ type: 'SET_OBJECTIVES', payload: objectives });
+        } catch (error) {
+          console.error('Erreur lors du chargement des objectifs:', error);
+          dispatch({ type: 'SET_ERROR', payload: 'Impossible de charger les objectifs' });
+        }
+      }
+    }
+
+    loadObjectives();
+  }, [state.isPlaying, state.loading, state.seed]);
+
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }
 
