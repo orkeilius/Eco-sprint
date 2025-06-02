@@ -1,11 +1,48 @@
 import { useEffect, useRef } from 'react';
-import { Map, NavigationControl } from 'maplibre-gl';
+import { Map, NavigationControl, Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './MapStyles.css';
+import { useGameState } from '../../context/GameContext';
 
 const GameMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<Map | null>(null);
+  const markers = useRef<Marker[]>([]);
+  const { state, dispatch } = useGameState();
+  const { objectives } = state;
+
+  // Affiche les marqueurs d'objectifs
+  const renderObjectiveMarkers = () => {
+    if (!map.current) return;
+    // Nettoie les anciens marqueurs
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
+    objectives.forEach(obj => {
+      const el = document.createElement('div');
+      el.className = 'marker-objective';
+      el.style.width = '24px';
+      el.style.height = '24px';
+      el.style.borderRadius = '50%';
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+      el.style.fontWeight = 'bold';
+      el.style.cursor = 'pointer';
+      el.style.background = obj.completed ? '#bbb' : '#2563eb';
+      el.style.color = obj.completed ? '#eee' : '#fff';
+      el.textContent = obj.pointValue.toString();
+      el.title = obj.name;
+      el.onclick = () => {
+        if (!obj.completed) {
+          dispatch({ type: 'SELECT_OBJECTIVE', payload: obj });
+        }
+      };
+      const marker = new Marker({ element: el })
+        .setLngLat([obj.lon, obj.lat])
+        .addTo(map.current!);
+      markers.current.push(marker);
+    });
+  };
 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
@@ -31,7 +68,6 @@ const GameMap = () => {
           }
         }
       }
-
       // Ajoute la couche 3D des bâtiments
       map.current!.addLayer({
         id: '3d-buildings',
@@ -59,13 +95,20 @@ const GameMap = () => {
           'fill-extrusion-opacity': 0.6
         }
       });
+      renderObjectiveMarkers();
     });
 
     return () => {
+      markers.current.forEach(marker => marker.remove());
       map.current?.remove();
       map.current = null;
     };
   }, []);
+
+  // Met à jour les marqueurs si les objectifs changent
+  useEffect(() => {
+    renderObjectiveMarkers();
+  }, [objectives]);
 
   return (
     <div className="h-full relative map-wrapper">
