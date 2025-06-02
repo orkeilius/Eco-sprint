@@ -1,18 +1,21 @@
-import GameMap from './components/GameMap';
-import PlanTrip from './components/PlanTrip';
-import type { Objective, Trip } from './components/PlanTrip';
-import { useState } from 'react';
+import { GameProvider } from './context/GameContext';
+import GameManager from './components/game/GameManager';
+import NavBar from './components/ui/NavBar';
 import './App.css';
 
-
 function App() {
-
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-4 text-center">
-        Montpellier Mobility Game
-      </h1>
-    </div>
+    <GameProvider>
+      <div className="min-h-screen flex flex-col bg-gray-100">
+        <NavBar />
+        <main className="flex-1 container mx-auto p-4">
+          <GameManager />
+        </main>
+        <footer className="bg-gray-200 text-center p-2 text-gray-600 text-sm">
+          Montpellier Mobility Game - Urban Journey Optimization
+        </footer>
+      </div>
+    </GameProvider>
   );
 }
 
