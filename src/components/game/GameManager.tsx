@@ -47,12 +47,12 @@ const GameManager = () => {
       ) : isGameOver ? (
         <EndGameScreen />
       ) : (
-        <div className="flex-1 flex flex-col">
+        <div className="h-full flex flex-col">
           <ScoreDisplay score={currentScore} timeRemaining={remainingTime} />
           
-          <div className="flex-1 flex flex-col md:flex-row gap-4">
+          <div className="flex-1 flex flex-col md:flex-row gap-4 overflow-hidden">
             {/* Side panel avec planification intégrée */}
-            <div className="md:w-1/4 w-full">
+            <div className="md:w-1/4 w-full h-full overflow-y-auto">
               <SidePanel
                 title="Objectives"
                 onTransportSelect={selectedObjective && !isDriving ? handleTransportSelect : undefined}
@@ -65,7 +65,7 @@ const GameManager = () => {
             </div>
             
             {/* Main game area */}
-            <div className="md:w-3/4 w-full flex-1 relative">
+            <div className="md:w-3/4 w-full flex-1 relative overflow-hidden">
               {/* Map component */}
               <div className="h-full">
                 <GameMap />
