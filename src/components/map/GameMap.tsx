@@ -44,6 +44,9 @@ const GameMap = () => {
   const drawRoute = async (mode: TransportMode, isPreview: boolean = false) => {
     if (!map.current || !selectedObjective || !playerPosition) return;
 
+    // Nettoyer les anciennes routes du même type (preview ou principal)
+    clearRoutes(isPreview);
+
     const sourceId = generateId('source', mode, isPreview);
     const layerId = generateId('layer', mode, isPreview);
 
@@ -130,6 +133,45 @@ const GameMap = () => {
       }
     };
 
+    // Recherche et suppression de toutes les couches et sources qui contiennent 'route'
+    const cleanAllRouteLayers = () => {
+      try {
+        const style = map.current!.getStyle();
+        if (!style || !style.layers) return;
+
+        // Trouver toutes les couches contenant 'route' dans leur id
+        const routeLayers = style.layers
+          .filter(layer => layer.id && layer.id.includes('route'))
+          .map(layer => layer.id);
+
+        // Supprimer toutes les couches d'itinéraire trouvées
+        routeLayers.forEach(layerId => {
+          try {
+            if (map.current!.getLayer(layerId)) {
+              map.current!.removeLayer(layerId);
+            }
+          } catch (e) { /* ignorer les erreurs */ }
+        });
+
+        // Trouver toutes les sources contenant 'route' dans leur id
+        if (style.sources) {
+          const routeSources = Object.keys(style.sources)
+            .filter(sourceId => sourceId.includes('route'));
+
+          // Supprimer toutes les sources d'itinéraire trouvées
+          routeSources.forEach(sourceId => {
+            try {
+              if (map.current!.getSource(sourceId)) {
+                map.current!.removeSource(sourceId);
+              }
+            } catch (e) { /* ignorer les erreurs */ }
+          });
+        }
+      } catch (e) {
+        console.error("Erreur lors du nettoyage des couches d'itinéraire:", e);
+      }
+    };
+
     // Si on nettoie l'aperçu, on supprime uniquement les couches d'aperçu
     if (isPreview) {
       if (activePreviewLayer) {
@@ -164,11 +206,14 @@ const GameMap = () => {
         const layerId = generateId('layer', mode, false);
         safelyRemoveLayerAndSource(layerId, sourceId);
 
-        // Nettoyer également les couches d'aperçu
+        // Nettoyer également les couches d'aper��u
         const previewSourceId = generateId('source', mode, true);
         const previewLayerId = generateId('layer', mode, true);
         safelyRemoveLayerAndSource(previewLayerId, previewSourceId);
       });
+
+      // Recherche et nettoyage global de toutes les couches liées aux routes
+      cleanAllRouteLayers();
 
       // Pour être absolument certain, essayer de supprimer l'ancien chemin 'player-path' du code précédent
       try {
